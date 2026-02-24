@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Booking Details</title>
+
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root{
+      --app-blue:#0d6fdc;
+      --accent-green:#9ed47a;
+      --accent-green-soft:#d5f2b6;
+      --accent-green-dark:#5fb623;
+      --text-main:#333;
+      --text-muted:#777;
+      --page-bg:#f0efe9;
+      --card-bg:#f8e6d3;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+
+    body{
+      font-family:"Roboto","Noto Sans Devanagari",system-ui,-apple-system,
+                  BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:#d9d9d9;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+    }
+
+    /* --- saari screen par text select / copy band --- */
+    html, body, .phone, .screen {
+    -webkit-user-select: none; /* Chrome/Safari/Android */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* old Edge/IE */
+    user-select: none;         /* standard */
+    -webkit-touch-callout: none; /* iOS long-press menu off */
+    }
+
+    .phone{
+      width:100%;
+      max-width:430px;
+      background:var(--page-bg);
+      min-height:100vh;
+      box-shadow:0 0 18px rgba(0,0,0,.35);
+      overflow:hidden;
+      position:relative; /* popup overlay ke liye */
+    }
+
+    /* -------- TOP BLUE BAR -------- */
+    .app-bar{
+      background:var(--app-blue);
+      color:#fff;
+      padding:10px 14px 12px;
+    }
+    .app-bar-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .app-bar-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .circle-btn{
+        width:40px;
+        height:40px;
+        border-radius:50%;
+        background:#0d6fdc;
+        color:#fff;
+        border:2px solid #fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:20px;
+        line-height:1;
+    }
+
+    .app-title{font-size:20px;font-weight:500;line-height:1.1;}
+    .app-sub{font-size:12px;opacity:.9;margin-top:2px;}
+    .app-bar-right{font-size:18px;}
+
+    .screen{
+      background:#e9e8e7;
+    }
+
+    /* -------- THANK YOU STRIP -------- */
+    .greeting-strip{
+      background:#ffffff;
+      border-bottom:1px solid #dedede;
+      padding:6px 14px;
+    }
+    .greeting{
+      font-size:13px;
+      color:var(--text-muted);
+    }
+
+    /* -------- WHITE TICKET CARD (pura ticket) -------- */
+    .ticket{position:relative;margin:6px 9px 16px;}
+    .ticket-inner{
+      position:relative;
+      background:#fff;
+      border-radius:18px;
+      padding:10px 12px 0px;
+      box-shadow:0 2px 4px rgba(0,0,0,.18);
+    }
+
+    .ticket-notch{
+      position:absolute;width:28px;height:28px;border-radius:50%;
+      background:#e9e8e7;
+      top:71.6%;transform:translateY(-50%);
+      box-shadow:0 0 0 0px rgba(0,0,0,.04);z-index:3;
+    }
+    .ticket-notch.left{left:-14px;}
+    .ticket-notch.right{right:-14px;}
+
+    .ticket-main{
+      position:relative;
+      z-index:1;
+      color:var(--text-main);
+    }
+
+    /* ========= BLACK DYNAMIC BOX ========= */
+
+    .dynamic-wrap{
+      background:var(--accent-green-soft);
+      border-radius:18px 18px 0 0;
+      padding-top:19px;
+      margin:-10px -12px 0;
+    }
+
+    .dynamic-card{
+      position:relative;
+      display:grid;
+      grid-template-columns:52px 1fr 52px;
+      background:#1c1c1c;
+      color:#fff;
+      border-radius:0 0 6px 6px;
+      overflow:hidden;
+      box-shadow:0 4px 6px rgba(0,0,0,.45) inset;
+    }
+
+    .dynamic-side{
+      background:linear-gradient(#404040,#292929);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 4px;
+      position:relative;
+    }
+    .dynamic-side.left::after{
+      content:"";
+      position:absolute;
+      top:10px;bottom:10px;
+      right:0;
+      border-right:3px dashed rgba(235,235,235,.95);
+    }
+    .dynamic-side.right::after{
+      content:"";
+      position:absolute;
+      top:10px;bottom:10px;
+      left:0;
+      border-left:3px dashed rgba(235,235,235,.95);
+    }
+
+    .side-text{
+      font-size:18px;
+      text-transform:uppercase;
+      color:#f5f5f5;
+      text-align:center;
+      text-shadow:0 1px 2px rgba(0,0,0,.8);
+    }
+    .side-text-en{
+      writing-mode:vertical-rl;
+      text-orientation:mixed;
+      transform:rotate(180deg);
+    }
+    .side-text-hi{
+      font-family:"Noto Sans Devanagari",sans-serif;
+      writing-mode:vertical-rl;
+      text-orientation:mixed;
+    }
+
+    .dynamic-center{
+      position:relative;
+      padding:10px 10px 12px;
+      text-align:center;
+      background-image:
+        linear-gradient(60deg, rgba(255,255,255,0.08) 12%, transparent 0%, transparent 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.08) 62%, transparent 10%, transparent 0%),
+        linear-gradient(-60deg, rgba(0,0,0,0.65) 12%, transparent 12%, transparent 0%, rgba(0,0,0,0.65) 50%, rgba(0,0,0,0.65) 62%, transparent 0%, transparent 0%);
+      background-size:44px 80px;
+      background-position:0 0, 22px 40px;
+    }
+
+    .dynamic-title{
+      font-size:18px;
+      font-weight:500;
+      margin-bottom:4px;
+      text-shadow:0 1px 2px rgba(0,0,0,.9);
+    }
+    .countdown{
+      font-size:38px;
+      font-weight:700;
+      letter-spacing:.14em;
+      color:#ff3b13;
+      margin:4px 0 4px;
+      text-shadow:0 1px 3px rgba(0,0,0,.9);
+    }
+    .dynamic-label-small{
+      font-size:11px;
+      opacity:.95;
+      margin-top:4px;
+    }
+    .dynamic-booking-dt{
+      font-size:22px;
+      font-weight:700;
+      color:#ffbf47;
+      margin-top:4px;
+      text-shadow:0 1px 3px rgba(0,0,0,.75);
+    }
+    .dynamic-pnr{font-size:12px;margin-top:3px;}
+    .dynamic-note{font-size:13px;margin-top:2px;opacity:.96;}
+
+    .dynamic-progress{
+      margin:0 10px 8px;
+      height:4px;
+      background:#d7f0c3;
+      border-radius:0 0 6px 6px;
+      overflow:hidden;
+    }
+    .dynamic-progress-bar{
+      height:100%;
+      width:0;
+      background:linear-gradient(to right,#8de63b,var(--accent-green-dark));
+      transition:width .8s linear;
+    }
+
+    /* ====== TICKET DETAILS ====== */
+
+    .ticket-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin:10px 0 4px;
+      font-size:14px;
+      font-weight:500;
+    }
+    .ticket-code{font-size:13px;font-weight:500;}
+
+    .station-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin:4px 0 6px;
+      font-size:13px;
+      font-weight:500;
+      line-height:1.2;
+    }
+    .station-row .km{
+      font-size:12px;
+      color:var(--text-muted);
+      font-weight:400;
+    }
+
+    .info-label{
+      font-size:11px;
+      color:var(--text-muted);
+    }
+    .value-text{
+      font-size:12.5px;
+      font-weight:500;
+      margin-top:2px;
+    }
+    .value-text-large{
+      font-size:13.5px;
+      font-weight:500;
+      margin-top:2px;
+      line-height:1.2;
+    }
+
+    .two-col-block{
+      display:flex;
+      /* line-height:2; */
+      justify-content:space-between;
+      margin:4px 0;
+    }
+    .two-col-block>div{flex:1;}
+    .two-col-block .right{text-align:right;}
+
+    .fare-single{
+      margin-top:6px;
+      font-size:12px;
+      line-height: 2;
+      font-weight:500;
+    }
+
+    .divider{
+      height:1px;
+      background:#f0e0ce;
+      margin:10px 0 6px;
+    }
+
+    .green-bar{
+      height:16px;
+      border-radius:0px 0px 18px 18px;
+      background:var(--accent-green-soft);
+      margin:8px -12px 0px;
+    }
+
+    .note-box{
+      background:#f8d6d3;
+      border-radius:8px;
+      padding:6px 10px;
+      font-size:11px;
+      color:#c62828;
+      line-height:1.4;
+      margin: 8px 1px 10px 1px;
+    }
+
+    /* Button */
+    .primary-btn{
+      display:block;
+      width:100%;max-width:270px;
+      border:none;border-radius:22px;
+      padding:10px;
+      margin:6px auto 12px;
+      background:#0067ff;color:#fff;
+      font-size:14px;font-weight:500;
+    }
+
+    /* ===== QR BOX full‑width edge-attached ===== */
+    .qr-box{
+      background:#fff;
+      border-top:1px solid #dedede;
+      padding:10px 0 14px;
+      margin:0;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+    .qr-image{
+      width:230px;
+      height:230px;
+      object-fit:contain;
+    }
+
+    /* ===== DO YOU KNOW full‑width white box ===== */
+    .info-box{
+      background:#ffffff;
+      border-top:1px solid #dedede;
+      padding:10px 14px 18px;
+      margin-bottom:12px;
+    }
+    .info-section{
+      font-size:12px;
+      color:var(--text-main);
+      line-height:1.45;
+    }
+    .info-section strong{font-weight:500;}
+
+    /* ==================== POPUP OVERLAY ==================== */
+    .popup-overlay{
+      position:absolute;
+      inset:0;
+      display:none;
+      align-items:flex-start;
+      padding-top: 200px;
+      justify-content:center;
+      background:rgba(0,0,0,0.55);          /* dark, not white */
+      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);
+      z-index:100;
+    }
+    .popup-overlay.show{
+      display:flex;
+    }
+
+    .popup-ticket{
+      background:linear-gradient(to bottom,#f4f5f8,#e5e7ee);
+      border-radius:24px;
+      width:90%;
+      max-width:360px;
+      padding:26px 16px 26px;
+      position:relative;
+      box-shadow:0 8px 22px rgba(0,0,0,.5);
+    }
+    .popup-inner{
+      font-size:13px;
+      color:var(--text-main);
+    }
+    .popup-header-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:8px;
+      font-size:14px;
+      font-weight:500;
+    }
+    .popup-mid-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin:4px 0 8px;
+      line-height: 3;
+      font-size:13px;
+      font-weight:500;
+    }
+    .popup-km{
+      font-size:12px;
+      color:var(--text-muted);
+      font-weight:400;
+    }
+    .popup-divider-dotted{
+      border-top:1px dashed #cfcfcf;
+      margin:10px 0 6px;
+    }
+    
+
+    .popup-close{
+      position:absolute;
+      top:6px;right:10px;
+      font-size:18px;
+      color:#777;
+      cursor:pointer;
+    }
+
+    @media(max-width:480px){
+      .ticket{margin:6px 6px 16px;}
+    }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- TOP BAR -->
+  <div class="app-bar">
+    <div class="app-bar-top">
+      <div class="app-bar-left">
+        <div class="circle-btn">&#8592;</div>
+        <div>
+          <div class="app-title">Booking Details</div>
+          <div class="app-sub">Mobile: 9350821597</div>
+        </div>
+      </div>
+      <div class="app-bar-right">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+          <circle cx="18" cy="5" r="3"/>
+          <circle cx="6" cy="12" r="3"/>
+          <circle cx="18" cy="19" r="3"/>
+          <line x1="8.6" y1="13.5" x2="15.4" y2="17.5" stroke="white" stroke-width="2"/>
+          <line x1="15.4" y1="6.5" x2="8.6" y2="10.5" stroke="white" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen">
+
+    <!-- THANK YOU STRIP -->
+    <div class="greeting-strip">
+      <div class="greeting">
+        Thank You KULDEEP BISHNOI, Happy Journey !
+      </div>
+    </div>
+
+    <!-- WHITE TICKET (card + shadow) -->
+    <div class="ticket">
+      <div class="ticket-inner">
+        <div class="ticket-main">
+
+          <!-- BLACK DYNAMIC BOX (attached to white edges) -->
+          <div class="dynamic-wrap">
+            <div class="dynamic-card">
+              <div class="dynamic-side left">
+                <span class="side-text side-text-en">INDIAN RAILWAYS</span>
+              </div>
+
+              <div class="dynamic-center">
+                <div class="dynamic-title">Dynamic preview will close in</div>
+                <div id="countdown" class="countdown">05:00</div>
+
+                <div class="dynamic-label-small">
+                  Ticket Booking Date &amp; Time
+                </div>
+                <div class="dynamic-booking-dt">27 Jan 2026, 07:55</div>
+                <div class="dynamic-pnr">R28428</div>
+                <div class="dynamic-note">Ticket is Non-Transferable</div>
+              </div>
+
+              <div class="dynamic-side right">
+                <span class="side-text side-text-hi">भारतीय रेल</span>
+              </div>
+            </div>
+
+            <div class="dynamic-progress">
+              <div id="progress-bar" class="dynamic-progress-bar"></div>
+            </div>
+          </div>
+
+          <!-- DETAILS -->
+          <div class="ticket-header">
+            <span>Season Ticket</span>
+            <span class="ticket-code">XS96E9Y04F</span>
+          </div>
+          <br>
+
+          <div class="station-row">
+            <span>RAIPUR JN.</span>
+            <span class="km">&mdash; 37 km &mdash;</span>
+            <span>DURG</span>
+          </div>
+
+          <div class="two-col-block">
+            <div>
+              <div class="info-label">Via</div>
+              <div class="value-text">BIA</div>
+            </div>
+            <div class="right">
+              <div class="info-label">Booked on</div>
+              <div class="value-text">27/01/2026 07:55</div>
+            </div>
+        </div>
+
+          <div class="two-col-block">
+            <div>
+              <div class="info-label">Valid From</div>
+              <div class="value-text">27/01/2026</div>
+            </div>
+            <div class="right">
+              <div class="info-label">*Valid Till</div>
+              <div class="value-text">26/04/2026</div>
+            </div>
+          </div>
+
+          <div class="fare-single">
+            QUARTERLY | SECOND | &#8377; 500.00
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="two-col-block" style="margin-top:8px;">
+            <div>
+              <div class="info-label">Name</div>
+              <div class="value-text-large">KULDEEP BISHNOI</div>
+            </div>
+            <div class="right">
+              <div class="info-label">Age</div>
+              <div class="value-text">20 years</div>
+            </div>
+          </div>
+
+          <div class="two-col-block">
+            <div>
+              <div class="info-label">ID Type</div>
+              <div class="value-text">Govt. issued Icard</div>
+            </div>
+            <div class="right">
+              <div class="info-label">ID Number</div>
+              <div class="value-text">650228034426</div>
+            </div>
+          </div>
+
+          <div class="green-bar"></div>
+
+        </div>
+      </div>
+
+      <div class="note-box">
+        Note: This ticket is non refundable. Ticket is stored locally on the
+        device. Please do not change your handset or perform factory reset.
+      </div>
+
+      <div class="ticket-notch left"></div>
+      <div class="ticket-notch right"></div>
+    </div>
+
+    <!-- Button -->
+    <button class="primary-btn">Upgrade to Superfast</button>
+
+    <!-- QR BOX -->
+    <div class="qr-box">
+      <img src="images/qr.png" alt="QR Code" class="qr-image">
+    </div>
+    <br>
+
+    <!-- DO YOU KNOW -->
+    <div class="info-box">
+      <div class="info-section">
+        <strong>Do you know?</strong><br><br>
+        IR recovers only 57% of cost of travel on an average.<br><br>
+        This ticket is booked on a personal user ID. Its sale/purchase is an
+        offence u/s 143 of the Railways Act, 1989.<br><br>
+        For enquiry and integrated railway helpline, please dial 139.
+      </div>
+    </div>
+
+  </div><!-- .screen -->
+
+  <!-- ===== POPUP OVERLAY (LONG PRESS) ===== -->
+  <div id="ticketOverlay" class="popup-overlay">
+    <div class="popup-ticket">
+      <div class="popup-inner">
+        <div class="popup-header-row">
+          <span>Season Ticket</span>
+          <span>R28428</span>
+          <span>XS96E9Y04F</span>
+        </div>
+        
+        <div class="popup-mid-row">
+            <span>RAIPUR JN.</span>
+            <span class="popup-km">&mdash; 37 km &mdash;</span>
+            <span>DURG</span>
+        </div>
+
+        <div class="two-col-block">
+          <div>
+            <div class="info-label">Via</div>
+            <div class="value-text">BIA</div>
+          </div>
+          <div class="right">
+            <div class="info-label">Booked on</div>
+            <div class="value-text">27/01/2026 07:55</div>
+          </div>
+        </div>
+        <br>
+
+        <div class="two-col-block">
+          <div>
+            <div class="info-label">Valid From</div>
+            <div class="value-text">27/01/2026</div>
+          </div>
+          <div class="right">
+            <div class="info-label">*Valid Till</div>
+            <div class="value-text">26/04/2026</div>
+          </div>
+        </div>
+
+        <div class="fare-single">
+          QUARTERLY | SECOND | &#8377; 500.00
+        </div>
+
+        <div class="popup-divider-dotted"></div>
+
+        <div class="two-col-block">
+          <div>
+            <div class="info-label">Name</div>
+            <div class="value-text-large">KULDEEP BISHNOI</div>
+          </div>
+          <div class="right">
+            <div class="info-label">Age</div>
+            <div class="value-text">20 years</div>
+          </div>
+        </div>
+
+        <div class="two-col-block">
+          <div>
+            <div class="info-label">ID Type</div>
+            <div class="value-text">Govt. issued Icard</div>
+          </div>
+          <div class="right">
+            <div class="info-label">ID Number</div>
+            <div class="value-text">650228034426</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .phone -->
+
+<!-- TIMER + POPUP SCRIPT -->
+<script>
+  window.addEventListener('DOMContentLoaded', function () {
+    /* ---- TIMER ---- */
+    var totalTime = 5 * 60;  // 5 minutes
+    var remaining = totalTime;
+    var counter = document.getElementById('countdown');
+    var progressBar = document.getElementById('progress-bar');
+
+    function updateTimer() {
+      var mins = Math.floor(remaining / 60);
+      var secs = remaining % 60;
+
+      var mm = (mins < 10 ? '0' : '') + mins;
+      var ss = (secs < 10 ? '0' : '') + secs;
+      counter.textContent = mm + ':' + ss;
+
+      var elapsed = totalTime - remaining;
+      var pct = (elapsed / totalTime) * 100;
+      progressBar.style.width = pct + '%';
+
+      if (remaining <= 0) {
+        clearInterval(timerId);
+        progressBar.style.width = '100%';
+        return;
+      }
+      remaining--;
+    }
+
+    updateTimer();
+    var timerId = setInterval(updateTimer, 1000);
+
+    /* ---- LONG PRESS POPUP ---- */
+    var overlay = document.getElementById('ticketOverlay');
+    var screenEl = document.querySelector('.screen');
+    var holdTimer;
+    var holdDelay = 600; // ms
+
+    function showOverlay(){
+      overlay.classList.add('show');
+    }
+
+    function startHold(e){
+      if(overlay.classList.contains('show')) return;
+      holdTimer = setTimeout(showOverlay, holdDelay);
+    }
+
+    function cancelHold(){
+      if(holdTimer){
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+    }
+
+    // long-press listeners
+    screenEl.addEventListener('mousedown', startHold);
+    screenEl.addEventListener('touchstart', startHold);
+
+    ['mouseup','mouseleave','touchend','touchcancel'].forEach(function(ev){
+      screenEl.addEventListener(ev, cancelHold);
+    });
+
+
+
+    // close popup
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay || e.target.classList.contains('popup-close')){
+        overlay.classList.remove('show');
+      }
+    });
+
+        // ---- system context menu / copy ko disable karo ----
+    document.addEventListener('contextmenu', function(e){
+      e.preventDefault();
+    });
+    document.addEventListener('selectstart', function(e){
+      e.preventDefault();
+    });
+
+  });
+</script>
+</body>
+</html>
